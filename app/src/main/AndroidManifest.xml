@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ru.skalix.service">
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -8,13 +10,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-            android:name="ru.skalix.service.MyService"
-            android:exported="true"
-            android:enabled="true">
-            <intent-filter >
+            android:name=".MyService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
                 <action android:name="ru.skalix.service.MY_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+
+        <receiver android:name=".TestWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/test_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
