@@ -18,8 +18,9 @@ import java.net.URISyntaxException;
 public class TestWidget extends AppWidgetProvider {
 
     final String UPDATE_ALL_WIDGETS = "update_all_widgets";
+    static int widget_delay = 300000;
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+    void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.test_widget);
         views.setTextViewText(R.id.appwidget_text, MyService.data);
 
@@ -54,7 +55,8 @@ public class TestWidget extends AppWidgetProvider {
         intent.setAction(UPDATE_ALL_WIDGETS);
         PendingIntent pIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), 5000, pIntent);
+
+        alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), widget_delay, pIntent);
     }
 
     @Override
@@ -64,6 +66,7 @@ public class TestWidget extends AppWidgetProvider {
         intent.setAction(UPDATE_ALL_WIDGETS);
         PendingIntent pIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
         alarmManager.cancel(pIntent);
     }
 }

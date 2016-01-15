@@ -12,8 +12,8 @@ public class TCPC {
     private BufferedReader in;
     private Socket soc = null;
 
-    String ip = null;
-    int port = 0;
+    private String ip = null;
+    private int port = 0;
 
     public TCPC(String IP, int PORT){
         ip = IP;
