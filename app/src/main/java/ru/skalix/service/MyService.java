@@ -10,11 +10,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MyService extends Service {
-    static String data = "Updating...";
-    static boolean trigger = false;
-    static String ip = "127.0.0.1";
-    static int port = 2007;
-    static int timer_delay = 300000;
+    public static String data = "";
+    public static boolean updater = false;
+    private String ip = "127.0.0.1";
+    private int port = 2007;
+    private int timer_delay = 300000; //5 min
 
     private TCPC client;
     private Thread conn;
@@ -35,20 +35,22 @@ public class MyService extends Service {
         conn = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
-                    if (trigger) {
+                for (;;) {
+                    if (updater) {
                         client = new TCPC(ip, port);
-                        if (client.Connect()) {
-                            Log.d("myLogs", "Connected!");
+                        if (client.Connect() && client != null) {
+                            Log.d("myLogs", "Connected to " + ip + ":" + port);
                             client.Send("GET");
                             data = client.Read();
                             client.Disconnect();
                             client = null;
-                            trigger = false;
+                            updater = false;
+                            refreshWidget();
                         } else {
                             Log.d("myLogs", "Failed connect!");
                             client = null;
                             data = "Fail!";
+                            refreshWidget();
                         }
                     }
                 }
@@ -64,12 +66,10 @@ public class MyService extends Service {
         ip = intent.getStringExtra("IP");
         port = intent.getIntExtra("PORT", 2007);
         timer_delay = intent.getIntExtra("TIMER", 300000);
-        TestWidget.widget_delay = intent.getIntExtra("WTIMER", 300000);
         data = intent.getStringExtra("DATA");
         Log.d("myLogs", "IP: " + ip);
         Log.d("myLogs", "PORT: " + port);
         Log.d("myLogs", "TIMER: " + timer_delay);
-        Log.d("myLogs", "WIDGET_UPDATE: " + TestWidget.widget_delay);
         Log.d("myLogs", "DATA: " + data);
         return START_STICKY;
     }
@@ -89,15 +89,20 @@ public class MyService extends Service {
             tmr = null;
         }
         data = "OFF";
+        refreshWidget();
         Toast.makeText(this, "Служба остановлена", Toast.LENGTH_SHORT).show();
         Log.d("myLogs", "Stop service.");
+    }
+
+    public void refreshWidget(){
+        Intent i = new Intent(TestWidget.FORCE_WIDGET_UPDATE);
+        sendBroadcast(i);
     }
 }
 
 class MTimerTask extends TimerTask {
-
     @Override
     public void run() {
-        MyService.trigger = true;
+        MyService.updater = true;
     }
 }
